@@ -1,5 +1,7 @@
 'use server';
+import { unstable_noStore as noStore } from 'next/cache';
 
+import { revalidatePath } from 'next/cache';
 import prisma from './db';
 
 export const getUsers = async () => {
@@ -8,6 +10,8 @@ export const getUsers = async () => {
 };
 
 export const getImages = async () => {
+  noStore();
   const data = await prisma.image.findMany();
+
   return data;
 };
