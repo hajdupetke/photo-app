@@ -4,6 +4,7 @@ import { UTApi } from 'uploadthing/server';
 import { revalidatePath } from 'next/cache';
 import prisma from './db';
 import { redirect } from 'next/navigation';
+import sharp from 'sharp';
 
 const utapi = new UTApi();
 
@@ -22,22 +23,36 @@ export const getImages = async () => {
 export const createImage = async (formData: FormData) => {
   const file = formData.get('image') as File;
   const title = formData.get('title') as string;
+  const name = formData.get('name') as string;
 
-  const response = await utapi.uploadFiles(file);
-  if (response.error != null) {
-    throw new Error('Upload failed');
+  const fileBuffer = await file.arrayBuffer();
+  try {
+    const compressedFileBuffer = await sharp(fileBuffer)
+      .png({ quality: 80, palette: true })
+      .toBuffer();
+    const compressedFile = new File(
+      [new Blob([compressedFileBuffer])],
+      'lajos.png'
+    );
+
+    const response = await utapi.uploadFiles(compressedFile);
+    if (response.error != null) {
+      throw new Error('Upload failed');
+    }
+
+    if (response.data != null) {
+      console.log('Upload successful');
+      const url = response['data']['url'];
+      const image = await prisma.image.create({
+        data: {
+          url: url,
+          name: name,
+          title: title,
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
   }
-
-  if (response.data != null) {
-    console.log('Upload successful');
-    const url = response['data']['url'];
-    const image = await prisma.image.create({
-      data: {
-        url: url,
-        name: title,
-      },
-    });
-  }
-
   redirect('/');
 };

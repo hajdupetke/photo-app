@@ -17,6 +17,13 @@ export default withUt({
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
+    colors: {
+      golden: '#997947',
+    },
   },
   plugins: [require('daisyui')],
+  darkMode: 'selector',
+  daisyui: {
+    themes: ['light'],
+  },
 });

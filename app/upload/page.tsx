@@ -13,6 +13,11 @@ export default function Page() {
           name="title"
           className="input input-bordered flex items-center gap-2"
         />
+        <input
+          type="text"
+          name="name"
+          className="input input-bordered flex items-center gap-2"
+        />
         <input type="file" name="image" />
         <button className="btn" type="submit">
           Mentés
