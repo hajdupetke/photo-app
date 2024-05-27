@@ -90,6 +90,7 @@ export const createImage = async (formData: FormData) => {
 
   const fileBuffer = await file.arrayBuffer();
   try {
+    /*
     const compressedFileBuffer = await sharp(fileBuffer)
       .png({ quality: 80, palette: true })
       .toBuffer();
@@ -97,8 +98,9 @@ export const createImage = async (formData: FormData) => {
       [new Blob([compressedFileBuffer])],
       Date.now() + file.name
     );
+    */
 
-    const response = await utapi.uploadFiles(compressedFile);
+    const response = await utapi.uploadFiles(file);
     if (response.error != null) {
       throw new Error('Upload failed');
     }
