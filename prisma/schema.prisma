@@ -14,11 +14,27 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+model Tag {
+  id Int @id @default(autoincrement())
+  name String
+  images ImageTag[]
+}
+
+model ImageTag {
+  tag Tag @relation(fields: [tagId], references: [id])
+  tagId Int
+  image Image @relation(fields: [imageId], references: [id])
+  imageId Int
+
+  @@id([tagId, imageId])
+}
+
 model Image {
   id Int @id @default(autoincrement())
   url String @unique
   name String?
   title String?
+  tags ImageTag[]
 }
 
 model User {

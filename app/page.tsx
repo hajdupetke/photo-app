@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { getUsers, getImages } from './api/action';
 import { Card } from './_components/Card';
 

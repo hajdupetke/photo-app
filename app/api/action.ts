@@ -5,11 +5,45 @@ import { revalidatePath } from 'next/cache';
 import prisma from './db';
 import { redirect } from 'next/navigation';
 import sharp from 'sharp';
+import { Image } from '@prisma/client';
 
 const utapi = new UTApi();
 
 export const getUsers = async () => {
   const data = await prisma.user.findMany();
+  return data;
+};
+
+export const getTags = async () => {
+  noStore();
+  const data = await prisma.tag.findMany();
+
+  return data;
+};
+
+export const getImageTags = async (img: Image) => {
+  noStore();
+
+  const data = await prisma.tag.findMany({
+    where: {
+      images: {
+        some: { image: img },
+      },
+    },
+    take: 2,
+  });
+
+  return data;
+};
+
+export const createImageTags = async (ids: number[], names: string[]) => {
+  noStore();
+  const data = await prisma.tag.findMany({
+    where: {
+      OR: [{ id: { in: ids } }, { name: { in: names } }],
+    },
+  });
+
   return data;
 };
 
@@ -24,6 +58,35 @@ export const createImage = async (formData: FormData) => {
   const file = formData.get('image') as File;
   const title = formData.get('title') as string;
   const name = formData.get('name') as string;
+  const tags = formData.getAll('tags');
+  console.log(tags);
+
+  const newTagNames = new Set(
+    tags.filter((e) => {
+      return isNaN(Number(e));
+    })
+  );
+
+  const tagIds = tags
+    .filter((e) => {
+      return !newTagNames.has(e);
+    })
+    .map((tag) => Number(tag));
+
+  console.log(tagIds);
+
+  //Create new tags
+  newTagNames.forEach(async (tag) => {
+    const newTag = await prisma.tag.create({
+      data: {
+        name: tag.toString(),
+      },
+    });
+  });
+
+  const newTagsArr = Array.from(newTagNames).map((tag) => tag.toString());
+
+  const finalTags = await createImageTags(tagIds, newTagsArr);
 
   const fileBuffer = await file.arrayBuffer();
   try {
@@ -32,7 +95,7 @@ export const createImage = async (formData: FormData) => {
       .toBuffer();
     const compressedFile = new File(
       [new Blob([compressedFileBuffer])],
-      'lajos.png'
+      Date.now() + file.name
     );
 
     const response = await utapi.uploadFiles(compressedFile);
@@ -48,11 +111,24 @@ export const createImage = async (formData: FormData) => {
           url: url,
           name: name,
           title: title,
+          tags: {
+            create: finalTags.map((tag) => {
+              return {
+                tag: {
+                  connect: { id: tag.id },
+                },
+              };
+            }),
+          },
+        },
+        include: {
+          tags: true,
         },
       });
     }
   } catch (error) {
     console.error(error);
   }
+
   redirect('/');
 };

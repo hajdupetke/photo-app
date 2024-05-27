@@ -1,3 +1,5 @@
+import { getImageTags } from '../api/action';
+
 interface CardProps {
   image: {
     id: number;
@@ -6,7 +8,9 @@ interface CardProps {
     title: string | null;
   };
 }
-export const Card = ({ image }: CardProps) => {
+export const Card = async ({ image }: CardProps) => {
+  const tags = await getImageTags(image);
+
   return (
     <div className="card card-compact w-96 bg-base-300 shadow-xl h-4/5">
       <div className="p-4 w-full h-3/4">
@@ -24,8 +28,13 @@ export const Card = ({ image }: CardProps) => {
           <p className="text-lg">{image.name}</p>
         </div>
         <div className="flex gap-2">
-          <div className="badge badge-primary">Tag 1</div>
-          <div className="badge badge-secondary">Tag 2</div>
+          {tags.map((tag) => {
+            return (
+              <div className="badge badge-neutral" key={tag.id}>
+                {tag.name}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
