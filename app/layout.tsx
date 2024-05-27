@@ -20,7 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nunitoSans.className} antialiased`}>
-        <Link href="/" className="static md:absolute top-0 left-0 right-0">
+        <Link
+          href="/"
+          className="static md:absolute top-0 left-0 right-0 max-w-fit"
+        >
           <Image
             src={Logo}
             alt="Logo"
