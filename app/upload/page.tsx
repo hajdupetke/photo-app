@@ -7,21 +7,33 @@ export default async function Page() {
   const tags = await getTags();
   console.log(tags);
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <form action={createImage} className="form-control">
-        <input
-          type="text"
-          name="title"
-          className="input input-bordered flex items-center gap-2"
-        />
-        <input
-          type="text"
-          name="name"
-          className="input input-bordered flex items-center gap-2"
-        />
+    <main className="flex  max-w-full flex-col  items-center justify-center p-24">
+      <form action={createImage} className="form-control gap-4 w-1/2">
+        <label className="input input-bordered flex items-center gap-2">
+          A kép címe
+          <input
+            name="title"
+            type="text"
+            className="grow"
+            placeholder="Mona Lisa"
+          />
+        </label>
+        <label className="input input-bordered flex items-center gap-2">
+          Készítő neve
+          <input
+            name="name"
+            type="text"
+            className="grow"
+            placeholder="Leonardo da Vinci"
+          />
+        </label>
         <CreatableMultiselect tags={tags} />
-        <input type="file" name="image" />
-        <button className="btn" type="submit">
+        <input
+          type="file"
+          name="image"
+          className="file-input file-input-bordered w-full max-w-xs"
+        />
+        <button className="btn max-w-min" type="submit">
           Mentés
         </button>
       </form>

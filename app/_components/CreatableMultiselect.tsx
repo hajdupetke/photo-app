@@ -15,7 +15,15 @@ const CreatableMultiselect = ({ tags }: SelectProps) => {
   });
   console.log(tagNames);
 
-  return <CreatableSelect isMulti options={tagNames} name="tags" />;
+  return (
+    <CreatableSelect
+      isMulti
+      options={tagNames}
+      name="tags"
+      className="h-1/3"
+      placeholder="Válaszd ki a képhez megfelelő tag-eket"
+    />
+  );
 };
 
 export default CreatableMultiselect;
