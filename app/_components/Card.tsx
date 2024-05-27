@@ -4,19 +4,19 @@ interface CardProps {
   image: {
     id: number;
     url: string;
-    name: string | null;
-    title: string | null;
+    name: string;
+    title: string;
   };
 }
 export const Card = async ({ image }: CardProps) => {
   const tags = await getImageTags(image);
 
   return (
-    <div className="card card-compact w-96 bg-base-300 shadow-xl h-4/5">
+    <div className="card card-compact w-full lg:w-96 bg-base-300 shadow-xl">
       <div className="p-4 w-full h-3/4">
         <img
           src={image.url}
-          alt="Shoes"
+          alt={image.title}
           className=" w-full h-full object-cover"
         />
       </div>

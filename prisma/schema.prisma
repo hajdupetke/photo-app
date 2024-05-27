@@ -32,8 +32,8 @@ model ImageTag {
 model Image {
   id Int @id @default(autoincrement())
   url String @unique
-  name String?
-  title String?
+  name String
+  title String
   tags ImageTag[]
 }
 

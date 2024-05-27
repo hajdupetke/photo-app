@@ -13,7 +13,6 @@ const CreatableMultiselect = ({ tags }: SelectProps) => {
   const tagNames = tags.map((e) => {
     return { value: e.id, label: e.name };
   });
-  console.log(tagNames);
 
   return (
     <CreatableSelect
