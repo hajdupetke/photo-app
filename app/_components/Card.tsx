@@ -1,12 +1,8 @@
+import { Image } from '@prisma/client';
 import { getImageTags } from '../api/action';
 
 interface CardProps {
-  image: {
-    id: number;
-    url: string;
-    name: string;
-    title: string;
-  };
+  image: Image;
 }
 export const Card = async ({ image }: CardProps) => {
   const tags = await getImageTags(image);

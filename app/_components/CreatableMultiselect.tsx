@@ -1,8 +1,7 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import CreatableSelect from 'react-select/creatable';
-import { getTags } from '../api/action';
 import { Tag } from '@prisma/client';
 
 interface SelectProps {
