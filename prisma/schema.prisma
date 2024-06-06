@@ -34,6 +34,7 @@ model Image {
   url String @unique
   name String
   title String
+  year Int @default(2024)
   tags ImageTag[]
 }
 

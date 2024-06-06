@@ -2,6 +2,7 @@
 import { createImage } from '../api/action';
 import { getTags } from '../api/action';
 import CreatableMultiselect from '../_components/CreatableMultiselect';
+import SubmitButton from '../_components/SubmitButton';
 
 export default async function Page() {
   const tags = await getTags();
@@ -27,15 +28,25 @@ export default async function Page() {
             placeholder="Leonardo da Vinci"
           />
         </label>
+        <label className="input input-bordered flex items-center gap-2">
+          Készítés éve
+          <input
+            name="year"
+            type="number"
+            className="grow"
+            min={1826}
+            max={new Date().getFullYear()}
+            placeholder="2024"
+          />
+        </label>
+
         <CreatableMultiselect tags={tags} />
         <input
           type="file"
           name="image"
           className="file-input file-input-bordered w-full max-w-xs"
         />
-        <button className="btn max-w-min" type="submit">
-          Mentés
-        </button>
+        <SubmitButton />
       </form>
     </main>
   );

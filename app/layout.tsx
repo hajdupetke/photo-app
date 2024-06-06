@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { Nunito_Sans } from 'next/font/google';
 import './globals.css';
-import Image from 'next/image';
-import Logo from './logo.png';
-import Link from 'next/link';
+import Logo from './_components/Logo';
+import InfoButton from './_components/InfoButton';
 
 const nunitoSans = Nunito_Sans({ subsets: ['latin'] });
 
@@ -20,18 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nunitoSans.className} antialiased`}>
-        <Link
-          href="/"
-          className="static md:absolute top-0 left-0 right-0 max-w-fit"
-        >
-          <Image
-            src={Logo}
-            alt="Logo"
-            width="100"
-            height="100"
-            className="p-4"
-          />
-        </Link>
+        <header className="flex items-center justify-between w-full">
+          <Logo />
+          <InfoButton />
+        </header>
         {children}
       </body>
     </html>

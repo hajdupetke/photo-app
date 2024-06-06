@@ -58,6 +58,7 @@ export const createImage = async (formData: FormData) => {
   const file = formData.get('image') as File;
   const title = formData.get('title') as string;
   const name = formData.get('name') as string;
+  const year = parseInt(formData.get('year') as string);
   const tags = formData.getAll('tags');
   console.log(tags);
 
@@ -113,6 +114,7 @@ export const createImage = async (formData: FormData) => {
           url: url,
           name: name,
           title: title,
+          year: year,
           tags: {
             create: finalTags.map((tag) => {
               return {
