@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Image" ADD COLUMN     "year" INTEGER NOT NULL DEFAULT 2024;
