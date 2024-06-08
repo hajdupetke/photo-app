@@ -8,7 +8,7 @@ export const Card = async ({ image }: CardProps) => {
   const tags = await getImageTags(image);
 
   return (
-    <div className="card card-compact w-full lg:w-96 bg-base-300 shadow-xl">
+    <div className="card card-compact w-full lg:w-96 bg-base-300 shadow-xl h-full">
       <div className="p-4 w-full h-3/4">
         <img
           src={image.url}

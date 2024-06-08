@@ -1,12 +1,11 @@
 'use server';
 import { unstable_noStore as noStore } from 'next/cache';
 import { UTApi } from 'uploadthing/server';
-import { revalidatePath } from 'next/cache';
 import prisma from './db';
 import { redirect } from 'next/navigation';
-import sharp from 'sharp';
 import { Image } from '@prisma/client';
 
+const ITEMS_PER_PAGE = 8;
 const utapi = new UTApi();
 
 export const getUsers = async () => {
@@ -36,6 +35,20 @@ export const getImageTags = async (img: Image) => {
   return data;
 };
 
+export const getAllImageTags = async (img: Image) => {
+  noStore();
+
+  const data = await prisma.tag.findMany({
+    where: {
+      images: {
+        some: { image: img },
+      },
+    },
+  });
+
+  return data;
+};
+
 export const createImageTags = async (ids: number[], names: string[]) => {
   noStore();
   const data = await prisma.tag.findMany({
@@ -47,9 +60,14 @@ export const createImageTags = async (ids: number[], names: string[]) => {
   return data;
 };
 
-export const getImages = async () => {
+export const getImages = async (currentPage: number) => {
   noStore();
-  const data = await prisma.image.findMany();
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  const data = await prisma.image.findMany({
+    skip: offset,
+    take: ITEMS_PER_PAGE,
+  });
 
   return data;
 };
@@ -135,4 +153,17 @@ export const createImage = async (formData: FormData) => {
   }
 
   redirect('/');
+};
+
+export const getImageById = async (id: number) => {
+  noStore();
+  const data = await prisma.image.findFirst({ where: { id: id } });
+  return data;
+};
+
+export const fetchNumOfPages = async () => {
+  noStore();
+  const data = Math.ceil((await prisma.image.count()) / ITEMS_PER_PAGE);
+
+  return data;
 };

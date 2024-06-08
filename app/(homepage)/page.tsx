@@ -1,16 +1,19 @@
-import { getUsers, getImages } from '../api/action';
-import { Card } from '../_components/Card';
+import { fetchNumOfPages } from '../api/action';
+import Pagination from '../_components/Pagination';
+import Images from '../_components/Images';
 
-export default async function Home() {
-  const images = await getImages();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: { page: number };
+}) {
+  const totalPages = await fetchNumOfPages();
+  const currentPage = Number(searchParams?.page) || 1;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between lg:p-24">
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-20">
-        {images.map((image, index) => {
-          return <Card key={index} image={image} />;
-        })}
-      </div>
+      <Images currentPage={currentPage} />
+      <Pagination totalPages={totalPages} />
     </main>
   );
 }
