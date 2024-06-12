@@ -11,7 +11,7 @@ export default async function Home({
   const currentPage = Number(searchParams?.page) || 1;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between lg:p-24">
+    <main className="flex flex-col items-center justify-between lg:p-24">
       <Images currentPage={currentPage} />
       <Pagination totalPages={totalPages} />
     </main>

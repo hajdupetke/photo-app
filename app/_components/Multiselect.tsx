@@ -1,6 +1,7 @@
 'use client';
 
 import { Tag } from '@prisma/client';
+import { useId } from 'react';
 import Select from 'react-select';
 
 interface MultiselectProps {
@@ -32,6 +33,7 @@ const Multiselect = ({ tags }: MultiselectProps) => {
       isMulti
       placeholder="Válaszd ki a tageket"
       className="basis-1 md:basis-1/2"
+      instanceId={useId()}
     />
   );
 };

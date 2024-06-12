@@ -4,6 +4,7 @@ import { UTApi } from 'uploadthing/server';
 import prisma from './db';
 import { redirect } from 'next/navigation';
 import { Image } from '@prisma/client';
+import { signIn } from './auth';
 
 const ITEMS_PER_PAGE = 8;
 const utapi = new UTApi();
@@ -11,6 +12,17 @@ const utapi = new UTApi();
 export const getUsers = async () => {
   const data = await prisma.user.findMany();
   return data;
+};
+
+export const getUser = async (email: string) => {
+  noStore();
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  return user;
 };
 
 export const getTags = async () => {
@@ -166,4 +178,14 @@ export const fetchNumOfPages = async () => {
   const data = Math.ceil((await prisma.image.count()) / ITEMS_PER_PAGE);
 
   return data;
+};
+
+export const authenticate = async (formData: FormData) => {
+  try {
+    await signIn('credentials', formData);
+  } catch (err) {
+    console.error(err);
+  }
+
+  redirect('/info');
 };
