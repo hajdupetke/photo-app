@@ -91,47 +91,30 @@ export const createImage = async (formData: FormData) => {
   const name = formData.get('name') as string;
   const year = parseInt(formData.get('year') as string);
   const tags = formData.getAll('tags');
-  console.log(tags);
 
-  const newTagNames = new Set(
-    tags.filter((e) => {
-      return isNaN(Number(e));
-    })
-  );
+  const newTagNames = tags.filter((tag) => {
+    return isNaN(Number(tag));
+  }) as string[];
+
+  const newTags = newTagNames.map((tag) => {
+    return { name: tag.toString() };
+  });
 
   const tagIds = tags
     .filter((e) => {
-      return !newTagNames.has(e);
+      return newTagNames.indexOf(e as string) == -1;
     })
-    .map((tag) => Number(tag));
-
-  console.log(tagIds);
-
-  //Create new tags
-  newTagNames.forEach(async (tag) => {
-    const newTag = await prisma.tag.create({
-      data: {
-        name: tag.toString(),
-      },
+    .map((tag) => {
+      return { id: Number(tag) };
     });
+
+  const createTag = newTagNames.map((tag) => {
+    return {
+      name: tag,
+    };
   });
 
-  const newTagsArr = Array.from(newTagNames).map((tag) => tag.toString());
-
-  const finalTags = await createImageTags(tagIds, newTagsArr);
-
-  const fileBuffer = await file.arrayBuffer();
   try {
-    /*
-    const compressedFileBuffer = await sharp(fileBuffer)
-      .png({ quality: 80, palette: true })
-      .toBuffer();
-    const compressedFile = new File(
-      [new Blob([compressedFileBuffer])],
-      Date.now() + file.name
-    );
-    */
-
     const response = await utapi.uploadFiles(file);
     if (response.error != null) {
       throw new Error('Upload failed');
@@ -140,6 +123,25 @@ export const createImage = async (formData: FormData) => {
     if (response.data != null) {
       console.log('Upload successful');
       const url = response['data']['url'];
+
+      const createdTags = await prisma.tag.createMany({
+        data: newTags,
+        skipDuplicates: true, // In case some tags already exist
+      });
+
+      const newTagIds = await prisma.tag.findMany({
+        where: {
+          name: {
+            in: newTagNames,
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const allTagIds = tagIds.concat(newTagIds.map((tag) => ({ id: tag.id })));
+
       const image = await prisma.image.create({
         data: {
           url: url,
@@ -147,13 +149,9 @@ export const createImage = async (formData: FormData) => {
           title: title,
           year: year,
           tags: {
-            create: finalTags.map((tag) => {
-              return {
-                tag: {
-                  connect: { id: tag.id },
-                },
-              };
-            }),
+            createMany: {
+              data: allTagIds.map((tagId) => ({ tagId: tagId.id })),
+            },
           },
         },
         include: {
@@ -227,6 +225,10 @@ export const deleteImage = async (searchParams: {
   const deleted = await prisma.image.delete({
     where: { id: id },
   });
+
+  const imageHash = deleted.url.split('/').pop() as string;
+
+  utapi.deleteFiles(imageHash);
 
   redirect('/admin');
 };

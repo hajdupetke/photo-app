@@ -9,7 +9,6 @@ const AreYouSureModal = async ({
 }: {
   searchParams?: { page: number; open: boolean; id: number };
 }) => {
-  console.log(searchParams?.open);
 
   const handleClose = () => {
     if (searchParams?.page) {

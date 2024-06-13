@@ -7,11 +7,11 @@ const ImagesTable = async ({ currentPage }: { currentPage: number }) => {
 
   return (
     <>
-      <table className="table">
+      <table className="table mb-4">
         {/* head */}
         <thead>
           <tr>
-            <th></th>
+            <th>ID</th>
             <th>Kép címe</th>
             <th>Készítő</th>
             <th></th>

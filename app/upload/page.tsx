@@ -6,7 +6,6 @@ import SubmitButton from '../_components/SubmitButton';
 
 export default async function Page() {
   const tags = await getTags();
-  console.log(tags);
   return (
     <main className="flex  max-w-full flex-col  items-center justify-center p-6 lg:p-24">
       <form action={createImage} className="form-control gap-4 w-full lg:w-1/2">
