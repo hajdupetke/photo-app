@@ -7,6 +7,7 @@ import { Image } from '@prisma/client';
 import { signIn } from './auth';
 
 const ITEMS_PER_PAGE = 8;
+const ADMIN_ITEMS_PER_PAGE = 1;
 const utapi = new UTApi();
 
 export const getUsers = async () => {
@@ -187,5 +188,45 @@ export const authenticate = async (formData: FormData) => {
     console.error(err);
   }
 
-  redirect('/info');
+  redirect('/admin');
+};
+
+export const adminFetchNumOfPages = async () => {
+  noStore();
+  const data = Math.ceil((await prisma.image.count()) / ADMIN_ITEMS_PER_PAGE);
+
+  return data;
+};
+
+export const adminGetImages = async (currentPage: number) => {
+  noStore();
+  const offset = (currentPage - 1) * ADMIN_ITEMS_PER_PAGE;
+
+  const data = await prisma.image.findMany({
+    skip: offset,
+    take: ADMIN_ITEMS_PER_PAGE,
+  });
+
+  return data;
+};
+
+export const deleteImage = async (searchParams: {
+  page: number;
+  open: boolean;
+  id: number;
+}) => {
+  const idString = searchParams.id.toString();
+  const id = parseInt(idString);
+
+  const deleteTag = await prisma.imageTag.deleteMany({
+    where: {
+      imageId: id,
+    },
+  });
+
+  const deleted = await prisma.image.delete({
+    where: { id: id },
+  });
+
+  redirect('/admin');
 };
