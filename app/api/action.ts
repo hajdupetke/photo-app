@@ -108,12 +108,6 @@ export const createImage = async (formData: FormData) => {
       return { id: Number(tag) };
     });
 
-  const createTag = newTagNames.map((tag) => {
-    return {
-      name: tag,
-    };
-  });
-
   try {
     const response = await utapi.uploadFiles(file);
     if (response.error != null) {
@@ -231,4 +225,114 @@ export const deleteImage = async (searchParams: {
   utapi.deleteFiles(imageHash);
 
   redirect('/admin');
+};
+
+export const updateImage = async (id: string, formData: FormData) => {
+  const file = formData.get('image') as File;
+  const title = formData.get('title') as string;
+  const name = formData.get('name') as string;
+  const year = parseInt(formData.get('year') as string);
+  const tags = formData.getAll('tags');
+
+  const image = await prisma.image.findFirst({ where: { id: parseInt(id) } });
+
+  console.log(image);
+
+  const newTagNames = tags.filter((tag) => {
+    return isNaN(Number(tag));
+  }) as string[];
+
+  const newTags = newTagNames.map((tag) => {
+    return { name: tag.toString() };
+  });
+
+  const tagIds = tags
+    .filter((e) => {
+      return newTagNames.indexOf(e as string) == -1;
+    })
+    .map((tag) => {
+      return { id: Number(tag) };
+    });
+
+  const createdTags = await prisma.tag.createMany({
+    data: newTags,
+    skipDuplicates: true, // In case some tags already exist
+  });
+
+  const newTagIds = await prisma.tag.findMany({
+    where: {
+      name: {
+        in: newTagNames,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const allTagIds = tagIds.concat(newTagIds.map((tag) => ({ id: tag.id })));
+
+  if (file && file.size > 0) {
+    //Delete old file, upload new, update image
+    const imageHash = image?.url.split('/').pop() as string;
+
+    utapi.deleteFiles(imageHash);
+
+    try {
+      const response = await utapi.uploadFiles(file);
+      if (response.error != null) {
+        throw new Error('Upload failed');
+      }
+
+      if (response.data != null) {
+        console.log('Upload successful');
+        const url = response['data']['url'];
+
+        const updateImage = await prisma.image.update({
+          where: {
+            id: parseInt(id),
+          },
+          data: {
+            url: url,
+            name: name,
+            title: title,
+            year: year,
+            tags: {
+              deleteMany: {},
+              createMany: {
+                data: allTagIds.map((tagId) => ({ tagId: tagId.id })),
+              },
+            },
+          },
+          include: {
+            tags: true,
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    //Update image with new parameters
+    const updateImage = await prisma.image.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        name: name,
+        title: title,
+        year: year,
+        tags: {
+          deleteMany: {},
+          createMany: {
+            data: allTagIds.map((tagId) => ({ tagId: tagId.id })),
+          },
+        },
+      },
+      include: {
+        tags: true,
+      },
+    });
+  }
+  redirect(`/picture/${id}`);
 };

@@ -23,7 +23,7 @@ const ImageRow = ({ image }: { image: Image }) => {
       <td>{image.name}</td>
       <td>
         <div className="flex gap-2 justify-end">
-          <Link className="btn btn-primary" href="/admin">
+          <Link className="btn btn-primary" href={`/admin/edit/${image.id}`}>
             Módosítás
           </Link>
           <Link className="btn btn-error" href={createPageURL(image.id)}>

@@ -6,10 +6,15 @@ import { Tag } from '@prisma/client';
 
 interface SelectProps {
   tags: Tag[];
+  selectedTags?: Tag[] | null;
 }
 
-const CreatableMultiselect = ({ tags }: SelectProps) => {
+const CreatableMultiselect = ({ tags, selectedTags }: SelectProps) => {
   const tagNames = tags.map((e) => {
+    return { value: e.id, label: e.name };
+  });
+
+  const selectedTagNames = selectedTags?.map((e) => {
     return { value: e.id, label: e.name };
   });
 
@@ -20,6 +25,7 @@ const CreatableMultiselect = ({ tags }: SelectProps) => {
       name="tags"
       className="h-1/3"
       placeholder="Válaszd ki a képhez megfelelő tag-eket"
+      defaultValue={selectedTagNames}
     />
   );
 };
