@@ -11,11 +11,11 @@ const Navbar = async () => {
     <header className="flex items-center justify-between w-full">
       <Logo />
       <div className="flex items-center">
-        {session ? (
+        {session.user ? (
           <form
             action={async () => {
               'use server';
-              await signOut();
+              await signOut({ callbackUrl: '/' });
             }}
           >
             <button type="submit">Kijelentkezés</button>

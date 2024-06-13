@@ -21,7 +21,7 @@ const PicturePage = async ({ params }: PicturePageProps) => {
         <p>{image.year}</p>
         {tags?.map((tag) => {
           return (
-            <div className="badge badge-neutral" key={tag.id}>
+            <div className="badge badge-neutral mr-2" key={tag.id}>
               {tag.name}
             </div>
           );

@@ -7,8 +7,13 @@ import {
 } from '@/app/api/action';
 import CreatableMultiselect from '@/app/_components/CreatableMultiselect';
 import SubmitButton from '@/app/_components/SubmitButton';
+import { redirect } from 'next/navigation';
+import { auth } from '@/app/api/auth';
 
 export default async function Page({ params }: { params: { id: string } }) {
+  const session = await auth();
+  if (!session) redirect('/login');
+
   const tags = await getTags();
   const image = await getImageById(parseInt(params.id));
   const imageTags = image ? await getAllImageTags(image) : null;
