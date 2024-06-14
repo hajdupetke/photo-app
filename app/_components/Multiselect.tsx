@@ -6,12 +6,14 @@ import Select from 'react-select';
 
 interface MultiselectProps {
   tags: Tag[];
+  setData: (tags: number[]) => void;
 }
 
-const Multiselect = ({ tags }: MultiselectProps) => {
+const Multiselect = ({ tags, setData }: MultiselectProps) => {
   const tagNames = tags.map((e) => {
     return { value: e.id, label: e.name };
   });
+
   return (
     <Select
       options={tagNames}
@@ -32,8 +34,14 @@ const Multiselect = ({ tags }: MultiselectProps) => {
       }}
       isMulti
       placeholder="Válaszd ki a tageket"
+      onChange={(tags) => {
+        const tagsArr = tags.map((tag) => tag.value);
+        console.log(tagsArr);
+        setData(tagsArr);
+      }}
       className="basis-1 md:basis-1/2"
       instanceId={useId()}
+      name="tags"
     />
   );
 };

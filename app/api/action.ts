@@ -7,7 +7,7 @@ import { Image } from '@prisma/client';
 import { signIn } from './auth';
 
 const ITEMS_PER_PAGE = 8;
-const ADMIN_ITEMS_PER_PAGE = 1;
+const ADMIN_ITEMS_PER_PAGE = 20;
 const utapi = new UTApi();
 
 export const getUsers = async () => {
@@ -73,15 +73,90 @@ export const createImageTags = async (ids: number[], names: string[]) => {
   return data;
 };
 
-export const getImages = async (currentPage: number) => {
+export const getImages = async (
+  currentPage: number,
+  tagIds: number[] | null,
+  query: string | null
+) => {
+  //Jesus christ, fix this
   noStore();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  if (
+    (tagIds === null || tagIds.length <= 0) &&
+    (query === null || query.length <= 0)
+  ) {
+    const data = await prisma.image.findMany({
+      skip: offset,
+      take: ITEMS_PER_PAGE,
+    });
 
+    return data;
+  } else if (query) {
+    const data = await prisma.image.findMany({
+      skip: offset,
+      take: ITEMS_PER_PAGE,
+      where: {
+        title: {
+          contains: query,
+        },
+        name: {
+          contains: query,
+        },
+      },
+    });
+
+    return data;
+  } else if (tagIds) {
+    const imageTags = await prisma.imageTag.findMany({
+      where: { tagId: { in: tagIds } },
+    });
+
+    const imageIds = imageTags.map((imageTag) => {
+      return imageTag.imageId;
+    });
+
+    const data = await prisma.image.findMany({
+      skip: offset,
+      take: ITEMS_PER_PAGE,
+      where: {
+        id: {
+          in: imageIds,
+        },
+      },
+    });
+
+    return data;
+  } else if (query && tagIds) {
+    const imageTags = await prisma.imageTag.findMany({
+      where: { tagId: { in: tagIds } },
+    });
+
+    const imageIds = imageTags.map((imageTag) => {
+      return imageTag.imageId;
+    });
+
+    const data = await prisma.image.findMany({
+      skip: offset,
+      take: ITEMS_PER_PAGE,
+      where: {
+        title: {
+          contains: query,
+        },
+        name: {
+          contains: query,
+        },
+        id: {
+          in: imageIds,
+        },
+      },
+    });
+
+    return data;
+  }
   const data = await prisma.image.findMany({
     skip: offset,
     take: ITEMS_PER_PAGE,
   });
-
   return data;
 };
 

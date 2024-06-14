@@ -1,19 +1,63 @@
-'use server';
+'use client';
 
 import Link from 'next/link';
-import { getTags } from '../api/action';
 import Multiselect from './Multiselect';
+import { Tag } from '@prisma/client';
+import { useState } from 'react';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
-const Menu = async () => {
-  const tags = await getTags();
+const Menu = ({ tags }: { tags: Tag[] }) => {
+  const [data, setData] = useState<{ query: string; tags: number[] }>({
+    query: '',
+    tags: [],
+  });
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  function handleSubmit() {
+    const params = new URLSearchParams(searchParams);
+    if (data.query != '') {
+      params.set('query', data.query);
+    } else {
+      params.delete('query');
+    }
+
+    if (data.tags.length > 0) {
+      params.set('tags', data.tags.join(','));
+    } else {
+      params.delete('tags');
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }
 
   return (
     <div className="w-full flex-row justify-center flex gap-1 mt-7">
-      <form className="flex flex-row justify-center gap-1 flex-wrap">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="flex flex-row justify-center gap-1 flex-wrap"
+      >
         <div className="flex gap-2 flex-wrap md:flex-nowrap justify-center px-10">
-          <Multiselect tags={tags} />
+          <Multiselect
+            tags={tags}
+            setData={(tags: number[]) => {
+              setData({ ...data, tags: tags });
+            }}
+          />
           <label className="basis-1 md:basis-1/2 input input-bordered flex items-center gap-2">
-            <input type="text" className="grow" placeholder="Keresés" />
+            <input
+              type="text"
+              className="grow"
+              placeholder="Keresés"
+              name="query"
+              value={data.query}
+              onChange={(event) =>
+                setData({ ...data, query: event.target.value })
+              }
+            />
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 16 16"

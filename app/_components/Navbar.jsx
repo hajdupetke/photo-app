@@ -12,14 +12,17 @@ const Navbar = async () => {
       <Logo />
       <div className="flex items-center">
         {session ? (
-          <form
-            action={async () => {
-              'use server';
-              await signOut({ callbackUrl: '/' });
-            }}
-          >
-            <button type="submit">Kijelentkezés</button>
-          </form>
+          <div className="flex gap-2">
+            <Link href="/admin">Admin</Link>
+            <form
+              action={async () => {
+                'use server';
+                await signOut({ callbackUrl: '/' });
+              }}
+            >
+              <button type="submit">Kijelentkezés</button>
+            </form>
+          </div>
         ) : (
           <Link href="/login">Bejelentkezés</Link>
         )}
