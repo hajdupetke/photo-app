@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { Image } from '@prisma/client';
 import { signIn } from './auth';
 
-const ITEMS_PER_PAGE = 24;
+const ITEMS_PER_PAGE = 36;
 const ADMIN_ITEMS_PER_PAGE = 20;
 const utapi = new UTApi();
 
