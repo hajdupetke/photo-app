@@ -1,6 +1,7 @@
 import { Card } from '../_components/Card';
 import Link from 'next/link';
 import { getImages } from '../api/action';
+import Pagination from './Pagination';
 
 const Images = async ({
   currentPage,
@@ -12,17 +13,21 @@ const Images = async ({
   query: string | null;
 }) => {
   const images = await getImages(currentPage, tagIds, query);
+  console.log(await images.length);
 
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-20 mb-12">
-      {images.map((image) => {
-        return (
-          <Link href={`/picture/${image.id}`} key={image.id}>
-            <Card image={image} />
-          </Link>
-        );
-      })}
-    </div>
+    <>
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-20 mb-12">
+        {images.map((image) => {
+          return (
+            <Link href={`/picture/${image.id}`} key={image.id}>
+              <Card image={image} />
+            </Link>
+          );
+        })}
+      </div>
+      <Pagination totalPages={Math.ceil(images.length / 36)} />
+    </>
   );
 };
 

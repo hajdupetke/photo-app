@@ -8,7 +8,6 @@ export default async function Home({
 }: {
   searchParams?: { page: number; tags: string; query: string };
 }) {
-  const totalPages = await fetchNumOfPages();
   const currentPage = Number(searchParams?.page) || 1;
   const query = searchParams?.query ?? null;
 
@@ -25,7 +24,6 @@ export default async function Home({
       <div className="flex-grow p-6 md:overflow-y-auto md:p-12">
         <main className="flex flex-col items-center justify-between lg:p-24">
           <Images currentPage={currentPage} tagIds={tagIds} query={query} />
-          <Pagination totalPages={totalPages} />
         </main>
       </div>
     </>

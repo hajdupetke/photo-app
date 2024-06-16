@@ -26,6 +26,7 @@ export const getUser = async (email: string) => {
   return user;
 };
 
+
 export const getTags = async () => {
   noStore();
   const data = await prisma.tag.findMany();
