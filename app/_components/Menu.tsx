@@ -28,6 +28,9 @@ const Menu = ({ tags }: { tags: Tag[] }) => {
     } else {
       params.delete('tags');
     }
+
+    params.set('page', '1');
+
     replace(`${pathname}?${params.toString()}`);
   }
 
