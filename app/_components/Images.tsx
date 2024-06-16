@@ -13,10 +13,8 @@ const Images = async ({
   query: string | null;
 }) => {
   const images = await getImages(currentPage, tagIds, query);
-  console.log(await images.length);
 
-  return (
-    <>
+  return (  
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-20 mb-12">
         {images.map((image) => {
           return (
@@ -26,8 +24,6 @@ const Images = async ({
           );
         })}
       </div>
-      <Pagination totalPages={Math.ceil(images.length / 36)} />
-    </>
   );
 };
 

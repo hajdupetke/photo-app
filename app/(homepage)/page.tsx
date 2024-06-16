@@ -15,6 +15,7 @@ export default async function Home({
     ? searchParams?.tags.split(',').map((tag) => parseInt(tag))
     : null;
 
+  const totalPages = await fetchNumOfPages(query, tagIds);
   const tags = await getTags();
 
   return (
@@ -24,6 +25,7 @@ export default async function Home({
       <div className="flex-grow p-6 md:overflow-y-auto md:p-12">
         <main className="flex flex-col items-center justify-between lg:p-24">
           <Images currentPage={currentPage} tagIds={tagIds} query={query} />
+          <Pagination totalPages={totalPages} />
         </main>
       </div>
     </>

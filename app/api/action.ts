@@ -26,7 +26,6 @@ export const getUser = async (email: string) => {
   return user;
 };
 
-
 export const getTags = async () => {
   noStore();
   const data = await prisma.tag.findMany();
@@ -276,11 +275,106 @@ export const getImageById = async (id: number) => {
   return data;
 };
 
-export const fetchNumOfPages = async () => {
+export const fetchNumOfPages = async (
+  query: string | null,
+  tagIds: number[] | null
+) => {
   noStore();
-  const data = Math.ceil((await prisma.image.count()) / ITEMS_PER_PAGE);
+  if (
+    (tagIds === null || tagIds.length <= 0) &&
+    (query === null || query.length <= 0)
+  ) {
+    const data = await prisma.image.count();
 
-  return data;
+    return Math.ceil(data / ITEMS_PER_PAGE);
+  } else if (query && tagIds) {
+    const imageTags = await prisma.imageTag.findMany({
+      where: { tagId: { in: tagIds } },
+    });
+
+    const imageIds = imageTags.map((imageTag) => {
+      return imageTag.imageId;
+    });
+
+    if (isNaN(Number(query))) {
+      const data = await prisma.image.count({
+        where: {
+          OR: [
+            {
+              title: {
+                contains: query,
+              },
+            },
+            {
+              name: {
+                contains: query,
+              },
+            },
+          ],
+          id: {
+            in: imageIds,
+          },
+        },
+      });
+
+      return Math.ceil(data / ITEMS_PER_PAGE);
+    } else {
+      const data = await prisma.image.count({
+        where: {
+          year: Number(query),
+        },
+      });
+      return Math.ceil(data / ITEMS_PER_PAGE);
+    }
+  } else if (query) {
+    if (isNaN(Number(query))) {
+      const data = await prisma.image.count({
+        where: {
+          OR: [
+            {
+              title: {
+                contains: query,
+              },
+            },
+            {
+              name: {
+                contains: query,
+              },
+            },
+          ],
+        },
+      });
+
+      return Math.ceil(data / ITEMS_PER_PAGE);
+    } else {
+      const data = await prisma.image.count({
+        where: {
+          year: Number(query),
+        },
+      });
+      return Math.ceil(data / ITEMS_PER_PAGE);
+    }
+  } else if (tagIds) {
+    const imageTags = await prisma.imageTag.findMany({
+      where: { tagId: { in: tagIds } },
+    });
+
+    const imageIds = imageTags.map((imageTag) => {
+      return imageTag.imageId;
+    });
+
+    const data = await prisma.image.count({
+      where: {
+        id: {
+          in: imageIds,
+        },
+      },
+    });
+
+    return Math.ceil(data / ITEMS_PER_PAGE);
+  }
+  const data = await prisma.image.count();
+  return Math.ceil(data / ITEMS_PER_PAGE);
 };
 
 export const authenticate = async (formData: FormData) => {
