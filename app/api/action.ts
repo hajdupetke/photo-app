@@ -91,32 +91,81 @@ export const getImages = async (
     });
 
     return data;
-  } else if (query) {
-    const data = await prisma.image.findMany({
-      skip: offset,
-      take: ITEMS_PER_PAGE,
-      where: {
-        OR: [
-          {
-            title: {
-              contains: query,
-            },
-          },
-          {
-            name: {
-              contains: query,
-            },
-          },
-          {
-            year: {
-              equals: Number(query),
-            },
-          },
-        ],
-      },
+  } else if (query && tagIds) {
+    const imageTags = await prisma.imageTag.findMany({
+      where: { tagId: { in: tagIds } },
     });
 
-    return data;
+    const imageIds = imageTags.map((imageTag) => {
+      return imageTag.imageId;
+    });
+
+    if (isNaN(Number(query))) {
+      const data = await prisma.image.findMany({
+        skip: offset,
+        take: ITEMS_PER_PAGE,
+        where: {
+          OR: [
+            {
+              title: {
+                contains: query,
+              },
+            },
+            {
+              name: {
+                contains: query,
+              },
+            },
+          ],
+          id: {
+            in: imageIds,
+          },
+        },
+      });
+
+      return data;
+    } else {
+      const data = await prisma.image.findMany({
+        skip: offset,
+        take: ITEMS_PER_PAGE,
+        where: {
+          year: Number(query),
+        },
+      });
+      return data;
+    }
+  } else if (query) {
+    if (isNaN(Number(query))) {
+      const data = await prisma.image.findMany({
+        skip: offset,
+        take: ITEMS_PER_PAGE,
+        where: {
+          OR: [
+            {
+              title: {
+                contains: query,
+              },
+            },
+            {
+              name: {
+                contains: query,
+              },
+            },
+          ],
+        },
+      });
+
+      return data;
+    } else {
+      const data = await prisma.image.findMany({
+        skip: offset,
+        take: ITEMS_PER_PAGE,
+        where: {
+          year: Number(query),
+        },
+      });
+      return data;
+    }
   } else if (tagIds) {
     const imageTags = await prisma.imageTag.findMany({
       where: { tagId: { in: tagIds } },
@@ -130,32 +179,6 @@ export const getImages = async (
       skip: offset,
       take: ITEMS_PER_PAGE,
       where: {
-        id: {
-          in: imageIds,
-        },
-      },
-    });
-
-    return data;
-  } else if (query && tagIds) {
-    const imageTags = await prisma.imageTag.findMany({
-      where: { tagId: { in: tagIds } },
-    });
-
-    const imageIds = imageTags.map((imageTag) => {
-      return imageTag.imageId;
-    });
-
-    const data = await prisma.image.findMany({
-      skip: offset,
-      take: ITEMS_PER_PAGE,
-      where: {
-        title: {
-          contains: query,
-        },
-        name: {
-          contains: query,
-        },
         id: {
           in: imageIds,
         },
