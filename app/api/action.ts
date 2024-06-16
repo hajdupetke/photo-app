@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { Image } from '@prisma/client';
 import { signIn } from './auth';
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 24;
 const ADMIN_ITEMS_PER_PAGE = 20;
 const utapi = new UTApi();
 
@@ -96,12 +96,23 @@ export const getImages = async (
       skip: offset,
       take: ITEMS_PER_PAGE,
       where: {
-        title: {
-          contains: query,
-        },
-        name: {
-          contains: query,
-        },
+        OR: [
+          {
+            title: {
+              contains: query,
+            },
+          },
+          {
+            name: {
+              contains: query,
+            },
+          },
+          {
+            year: {
+              equals: Number(query),
+            },
+          },
+        ],
       },
     });
 
