@@ -1,4 +1,3 @@
-'use server';
 import { createImage } from '../api/action';
 import { getTags } from '../api/action';
 import CreatableMultiselect from '../_components/CreatableMultiselect';

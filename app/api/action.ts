@@ -4,7 +4,7 @@ import { UTApi } from 'uploadthing/server';
 import prisma from './db';
 import { redirect } from 'next/navigation';
 import { Image } from '@prisma/client';
-import { signIn } from './auth';
+import { signIn, signOut } from './auth';
 
 const ITEMS_PER_PAGE = 36;
 const ADMIN_ITEMS_PER_PAGE = 20;
@@ -547,4 +547,8 @@ export const updateImage = async (id: string, formData: FormData) => {
     });
   }
   redirect(`/picture/${id}`);
+};
+
+export const logOut = async () => {
+  await signOut({ redirectTo: '/' });
 };

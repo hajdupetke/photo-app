@@ -2,7 +2,7 @@ import Logo from './Logo';
 import InfoButton from './InfoButton';
 import { auth } from '../api/auth';
 import Link from 'next/link';
-import { signOut } from '../api/auth';
+import { logOut } from '../api/action';
 
 const Navbar = async () => {
   const session = await auth();
@@ -14,12 +14,7 @@ const Navbar = async () => {
         {session ? (
           <div className="flex gap-2">
             <Link href="/admin">Admin</Link>
-            <form
-              action={async () => {
-                'use server';
-                await signOut({ callbackUrl: '/' });
-              }}
-            >
+            <form action={logOut}>
               <button type="submit">Kijelentkezés</button>
             </form>
           </div>
