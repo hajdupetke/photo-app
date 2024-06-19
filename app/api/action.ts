@@ -109,11 +109,13 @@ export const getImages = async (
             {
               title: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
             {
               name: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
           ],
@@ -144,11 +146,13 @@ export const getImages = async (
             {
               title: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
             {
               name: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
           ],
@@ -303,11 +307,13 @@ export const fetchNumOfPages = async (
             {
               title: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
             {
               name: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
           ],
@@ -334,11 +340,13 @@ export const fetchNumOfPages = async (
             {
               title: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
             {
               name: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
           ],
