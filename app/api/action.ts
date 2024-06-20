@@ -73,127 +73,72 @@ export const createImageTags = async (ids: number[], names: string[]) => {
   return data;
 };
 
+const generateQuery = async (tagIds: number[] | null, query: string | null) => {
+  let whereObj = {};
+
+  if (tagIds && tagIds.length > 0) {
+    const imageTags = await prisma.imageTag.findMany({
+      where: { tagId: { in: tagIds } },
+    });
+
+    const imageIds = imageTags.map((imageTag) => {
+      return imageTag.imageId;
+    });
+
+    whereObj = {
+      ...whereObj,
+      id: {
+        in: imageIds,
+      },
+    };
+  }
+
+  if (query && query.length > 0) {
+    if (isNaN(Number(query))) {
+      whereObj = {
+        ...whereObj,
+
+        OR: [
+          {
+            title: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            name: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      };
+    } else {
+      whereObj = {
+        ...whereObj,
+        year: Number(query),
+      };
+    }
+  }
+
+  return whereObj;
+};
+
 export const getImages = async (
   currentPage: number,
   tagIds: number[] | null,
   query: string | null
 ) => {
-  //Jesus christ, fix this
   noStore();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-  if (
-    (tagIds === null || tagIds.length <= 0) &&
-    (query === null || query.length <= 0)
-  ) {
-    const data = await prisma.image.findMany({
-      skip: offset,
-      take: ITEMS_PER_PAGE,
-    });
 
-    return data;
-  } else if (query && tagIds) {
-    const imageTags = await prisma.imageTag.findMany({
-      where: { tagId: { in: tagIds } },
-    });
+  const whereObj = await generateQuery(tagIds, query);
+  console.log(whereObj);
 
-    const imageIds = imageTags.map((imageTag) => {
-      return imageTag.imageId;
-    });
-
-    if (isNaN(Number(query))) {
-      const data = await prisma.image.findMany({
-        skip: offset,
-        take: ITEMS_PER_PAGE,
-        where: {
-          OR: [
-            {
-              title: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-            {
-              name: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-          ],
-          id: {
-            in: imageIds,
-          },
-        },
-      });
-
-      return data;
-    } else {
-      const data = await prisma.image.findMany({
-        skip: offset,
-        take: ITEMS_PER_PAGE,
-        where: {
-          year: Number(query),
-        },
-      });
-      return data;
-    }
-  } else if (query) {
-    if (isNaN(Number(query))) {
-      const data = await prisma.image.findMany({
-        skip: offset,
-        take: ITEMS_PER_PAGE,
-        where: {
-          OR: [
-            {
-              title: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-            {
-              name: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-      });
-
-      return data;
-    } else {
-      const data = await prisma.image.findMany({
-        skip: offset,
-        take: ITEMS_PER_PAGE,
-        where: {
-          year: Number(query),
-        },
-      });
-      return data;
-    }
-  } else if (tagIds) {
-    const imageTags = await prisma.imageTag.findMany({
-      where: { tagId: { in: tagIds } },
-    });
-
-    const imageIds = imageTags.map((imageTag) => {
-      return imageTag.imageId;
-    });
-
-    const data = await prisma.image.findMany({
-      skip: offset,
-      take: ITEMS_PER_PAGE,
-      where: {
-        id: {
-          in: imageIds,
-        },
-      },
-    });
-
-    return data;
-  }
   const data = await prisma.image.findMany({
     skip: offset,
     take: ITEMS_PER_PAGE,
+    where: Object.keys(whereObj).length > 0 ? whereObj : undefined,
   });
   return data;
 };
@@ -284,104 +229,10 @@ export const fetchNumOfPages = async (
   tagIds: number[] | null
 ) => {
   noStore();
-  if (
-    (tagIds === null || tagIds.length <= 0) &&
-    (query === null || query.length <= 0)
-  ) {
-    const data = await prisma.image.count();
-
-    return Math.ceil(data / ITEMS_PER_PAGE);
-  } else if (query && tagIds) {
-    const imageTags = await prisma.imageTag.findMany({
-      where: { tagId: { in: tagIds } },
-    });
-
-    const imageIds = imageTags.map((imageTag) => {
-      return imageTag.imageId;
-    });
-
-    if (isNaN(Number(query))) {
-      const data = await prisma.image.count({
-        where: {
-          OR: [
-            {
-              title: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-            {
-              name: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-          ],
-          id: {
-            in: imageIds,
-          },
-        },
-      });
-
-      return Math.ceil(data / ITEMS_PER_PAGE);
-    } else {
-      const data = await prisma.image.count({
-        where: {
-          year: Number(query),
-        },
-      });
-      return Math.ceil(data / ITEMS_PER_PAGE);
-    }
-  } else if (query) {
-    if (isNaN(Number(query))) {
-      const data = await prisma.image.count({
-        where: {
-          OR: [
-            {
-              title: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-            {
-              name: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-      });
-
-      return Math.ceil(data / ITEMS_PER_PAGE);
-    } else {
-      const data = await prisma.image.count({
-        where: {
-          year: Number(query),
-        },
-      });
-      return Math.ceil(data / ITEMS_PER_PAGE);
-    }
-  } else if (tagIds) {
-    const imageTags = await prisma.imageTag.findMany({
-      where: { tagId: { in: tagIds } },
-    });
-
-    const imageIds = imageTags.map((imageTag) => {
-      return imageTag.imageId;
-    });
-
-    const data = await prisma.image.count({
-      where: {
-        id: {
-          in: imageIds,
-        },
-      },
-    });
-
-    return Math.ceil(data / ITEMS_PER_PAGE);
-  }
-  const data = await prisma.image.count();
+  const whereObj = await generateQuery(tagIds, query);
+  const data = await prisma.image.count({
+    where: Object.keys(whereObj).length > 0 ? whereObj : undefined,
+  });
   return Math.ceil(data / ITEMS_PER_PAGE);
 };
 
