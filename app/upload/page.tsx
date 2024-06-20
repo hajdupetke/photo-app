@@ -7,7 +7,11 @@ export default async function Page() {
   const tags = await getTags();
   return (
     <main className="flex  max-w-full flex-col  items-center justify-center p-6 lg:p-24">
-      <form action={createImage} className="form-control gap-4 w-full lg:w-1/2">
+      <form
+        action={createImage}
+        encType="multipart/form-data"
+        className="form-control gap-4 w-full lg:w-1/2"
+      >
         <label className="input input-bordered flex items-center gap-2">
           A kép címe
           <input
