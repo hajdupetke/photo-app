@@ -3,6 +3,8 @@ import { getTags } from '../api/action';
 import CreatableMultiselect from '../_components/CreatableMultiselect';
 import SubmitButton from '../_components/SubmitButton';
 
+export const maxDuration = 60;
+
 export default async function Page() {
   const tags = await getTags();
   return (

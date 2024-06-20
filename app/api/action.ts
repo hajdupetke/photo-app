@@ -139,6 +139,9 @@ export const getImages = async (
     skip: offset,
     take: ITEMS_PER_PAGE,
     where: Object.keys(whereObj).length > 0 ? whereObj : undefined,
+    orderBy: {
+      id: 'desc',
+    },
   });
   return data;
 };
